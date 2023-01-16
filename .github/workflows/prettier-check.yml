@@ -37,3 +37,6 @@ jobs:
             ${{ runner.os }}-node-
       - name: Install dependencies
         run: npm ci
+
+      - name: Run Pretty Style Check
+        run: npm run style:prettier
