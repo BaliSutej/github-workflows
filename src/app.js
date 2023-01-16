@@ -1,19 +1,19 @@
 const { buildResponse } = require("/opt/nodejs/helper.js");
 const {
-	getAllUsers,
-	getUserDetailsById,
-	checkTeamById,
-	updateUserById,
-	addUser,
-	checkUserExists,
-	checkUserAssociation,
-	deleteUserById
+  getAllUsers,
+  getUserDetailsById,
+  checkTeamById,
+  updateUserById,
+  addUser,
+  checkUserExists,
+  checkUserAssociation,
+  deleteUserById
 } = require("./userMaintenance.service");
 const {
-	teamKeywordSchema,
-	userIdSchema,
-	updateUserSchema,
-	addUserSchema
+  teamKeywordSchema,
+  userIdSchema,
+  updateUserSchema,
+  addUserSchema
 } = require("./userMaintenance.validation");
 /**
  * lambda handler for user maintenance
@@ -23,69 +23,69 @@ const {
  */
 
 const lambdaHandler = async (event, context) => {
-	let response; // response variable returned by lambda
+  let response; // response variable returned by lambda
 
-	try {
-		/**
-		 * Logging event object received by lambda
-		 */
-		console.info("User Maintenance lambda invoked, event atached below");
-		console.log(JSON.stringify(event));
+  try {
+    /**
+     * Logging event object received by lambda
+     */
+    console.info("User Maintenance lambda invoked, event atached below");
+    console.log(JSON.stringify(event));
 
-		/**
-		 * variables used in switch statements
-		 */
-		let eventMethod = event.httpMethod;
-		let eventPath = event.resource;
-		switch (eventPath) {
-			case "/user":
-				if (eventMethod === "GET") {
-					response = await handleGetAllUsers(event);
-				} else {
-					response = buildResponse(404, {
-						message: "No Such Method"
-					});
-				}
-				break;
-			case "/user/create":
-				if (eventMethod === "POST") {
-					response = await handleCreateUser(event);
-				} else {
-					response = buildResponse(404, {
-						message: "No Such Method"
-					});
-				}
-				break;
-			case "/user/{userId}":
-				if (eventMethod === "GET") {
-					response = await handleGetUserDetails(event);
-				} else if (eventMethod === "PUT") {
-					response = await handleUpdateUser(event);
-				} else if (eventMethod === "DELETE") {
-					response = await handleDeleteUser(event);
-				} else {
-					response = buildResponse(404, {
-						message: "No Such Method"
-					});
-				}
-				break;
-			default:
-				console.info("Error Occured");
-				response = buildResponse(404, {
-					message: "No Such Method"
-				});
-				break;
-		}
-		// Returning response
-		return response;
-	} catch (error) {
-		console.log("Error Occured");
-		console.log(error);
-		response = buildResponse(500, {
-			message: "Internal Error Occured"
-		});
-	}
-	return response;
+    /**
+     * variables used in switch statements
+     */
+    let eventMethod = event.httpMethod;
+    let eventPath = event.resource;
+    switch (eventPath) {
+      case "/user":
+        if (eventMethod === "GET") {
+          response = await handleGetAllUsers(event);
+        } else {
+          response = buildResponse(404, {
+            message: "No Such Method"
+          });
+        }
+        break;
+      case "/user/create":
+        if (eventMethod === "POST") {
+          response = await handleCreateUser(event);
+        } else {
+          response = buildResponse(404, {
+            message: "No Such Method"
+          });
+        }
+        break;
+      case "/user/{userId}":
+        if (eventMethod === "GET") {
+          response = await handleGetUserDetails(event);
+        } else if (eventMethod === "PUT") {
+          response = await handleUpdateUser(event);
+        } else if (eventMethod === "DELETE") {
+          response = await handleDeleteUser(event);
+        } else {
+          response = buildResponse(404, {
+            message: "No Such Method"
+          });
+        }
+        break;
+      default:
+        console.info("Error Occured");
+        response = buildResponse(404, {
+          message: "No Such Method"
+        });
+        break;
+    }
+    // Returning response
+    return response;
+  } catch (error) {
+    console.log("Error Occured");
+    console.log(error);
+    response = buildResponse(500, {
+      message: "Internal Error Occured"
+    });
+  }
+  return response;
 };
 
 /**
@@ -94,38 +94,38 @@ const lambdaHandler = async (event, context) => {
  * @returns response array of object containing
  */
 const handleGetAllUsers = async (event) => {
-	let validTeamName;
-	if (event.queryStringParameters) {
-		try {
-			validTeamName = await teamKeywordSchema.validateAsync(
-				event.queryStringParameters
-			);
-		} catch (error) {
-			return buildResponse(400, {
-				message: error.message
-			});
-		}
-	}
+  let validTeamName;
+  if (event.queryStringParameters) {
+    try {
+      validTeamName = await teamKeywordSchema.validateAsync(
+        event.queryStringParameters
+      );
+    } catch (error) {
+      return buildResponse(400, {
+        message: error.message
+      });
+    }
+  }
 
-	const formattedData = await getAllUsers(process.env, validTeamName?.team);
-	const users = formattedData.map((user) => ({
-		id: user?.id?.toString(),
-		firstName: user?.first_name,
-		lastName: user?.last_name,
-		status: user?.status,
-		team: {
-			id: user?.team_id?.toString(),
-			value: user?.team_name
-		},
-		initials: user?.initials,
-		createdBy: {
-			id: user?.creator_id,
-			name: user?.created_by
-		},
-		addedDate: new Date(user.created_at).toISOString()
-	}));
+  const formattedData = await getAllUsers(process.env, validTeamName?.team);
+  const users = formattedData.map((user) => ({
+    id: user?.id?.toString(),
+    firstName: user?.first_name,
+    lastName: user?.last_name,
+    status: user?.status,
+    team: {
+      id: user?.team_id?.toString(),
+      value: user?.team_name
+    },
+    initials: user?.initials,
+    createdBy: {
+      id: user?.creator_id,
+      name: user?.created_by
+    },
+    addedDate: new Date(user.created_at).toISOString()
+  }));
 
-	return buildResponse(200, users);
+  return buildResponse(200, users);
 };
 
 /**
@@ -134,49 +134,49 @@ const handleGetAllUsers = async (event) => {
  * @returns response user details object
  */
 const handleGetUserDetails = async (event) => {
-	if (event.pathParameters) {
-		let validUserId;
-		try {
-			let pathParams = event.pathParameters;
-			validUserId = await userIdSchema.validateAsync(pathParams);
-		} catch (error) {
-			return buildResponse(400, {
-				message: error.message
-			});
-		}
+  if (event.pathParameters) {
+    let validUserId;
+    try {
+      let pathParams = event.pathParameters;
+      validUserId = await userIdSchema.validateAsync(pathParams);
+    } catch (error) {
+      return buildResponse(400, {
+        message: error.message
+      });
+    }
 
-		let userDataResponse = await getUserDetailsById(
-			process.env,
-			validUserId.userId
-		);
-		if (!userDataResponse.success) {
-			return buildResponse(404, { message: userDataResponse.message });
-		}
+    let userDataResponse = await getUserDetailsById(
+      process.env,
+      validUserId.userId
+    );
+    if (!userDataResponse.success) {
+      return buildResponse(404, { message: userDataResponse.message });
+    }
 
-		const userData = userDataResponse.data;
-		const user = {
-			id: userData?.id?.toString(),
-			firstName: userData?.first_name,
-			lastName: userData?.last_name,
-			status: userData?.status,
-			email: userData?.email,
-			team: {
-				id: userData?.team_id?.toString(),
-				value: userData?.team_name
-			},
-			initials: userData?.initials,
-			createdBy: {
-				id: userData?.creator_id,
-				name: userData?.created_by
-			},
-			addedDate: new Date(userData.created_at).toISOString()
-		};
+    const userData = userDataResponse.data;
+    const user = {
+      id: userData?.id?.toString(),
+      firstName: userData?.first_name,
+      lastName: userData?.last_name,
+      status: userData?.status,
+      email: userData?.email,
+      team: {
+        id: userData?.team_id?.toString(),
+        value: userData?.team_name
+      },
+      initials: userData?.initials,
+      createdBy: {
+        id: userData?.creator_id,
+        name: userData?.created_by
+      },
+      addedDate: new Date(userData.created_at).toISOString()
+    };
 
-		return buildResponse(200, user);
-	}
-	return buildResponse(400, {
-		message: "Missing userId Path Parameter"
-	});
+    return buildResponse(200, user);
+  }
+  return buildResponse(400, {
+    message: "Missing userId Path Parameter"
+  });
 };
 
 /**
@@ -185,47 +185,47 @@ const handleGetUserDetails = async (event) => {
  * @returns response array of object containing
  */
 const handleUpdateUser = async (event) => {
-	if (event.pathParameters !== null && event.body !== null) {
-		let validUserId;
-		let validUserData;
-		try {
-			let pathParams = event.pathParameters;
-			let userData = JSON.parse(event.body);
+  if (event.pathParameters !== null && event.body !== null) {
+    let validUserId;
+    let validUserData;
+    try {
+      let pathParams = event.pathParameters;
+      let userData = JSON.parse(event.body);
 
-			validUserId = await userIdSchema.validateAsync(pathParams);
-			validUserData = await updateUserSchema.validateAsync(userData);
-		} catch (error) {
-			return buildResponse(400, {
-				message: error.message
-			});
-		}
+      validUserId = await userIdSchema.validateAsync(pathParams);
+      validUserData = await updateUserSchema.validateAsync(userData);
+    } catch (error) {
+      return buildResponse(400, {
+        message: error.message
+      });
+    }
 
-		// Validate Team ID
-		let teamData = await checkTeamById(process.env, validUserData.teamId);
+    // Validate Team ID
+    let teamData = await checkTeamById(process.env, validUserData.teamId);
 
-		if (!teamData.success) {
-			return buildResponse(404, { message: teamData.message });
-		}
+    if (!teamData.success) {
+      return buildResponse(404, { message: teamData.message });
+    }
 
-		// Add user details
-		validUserData.updatedByUserId = event.requestContext.authorizer.userId;
+    // Add user details
+    validUserData.updatedByUserId = event.requestContext.authorizer.userId;
 
-		let updateData = await updateUserById(
-			process.env,
-			validUserData,
-			validUserId.userId
-		);
+    let updateData = await updateUserById(
+      process.env,
+      validUserData,
+      validUserId.userId
+    );
 
-		if (!updateData.success) {
-			return buildResponse(500, {
-				message: updateData.message
-			});
-		}
-		return buildResponse(200, { message: "User Updated Successfully" });
-	}
-	return buildResponse(400, {
-		message: "Missing userId Path Parameters or User data"
-	});
+    if (!updateData.success) {
+      return buildResponse(500, {
+        message: updateData.message
+      });
+    }
+    return buildResponse(200, { message: "User Updated Successfully" });
+  }
+  return buildResponse(400, {
+    message: "Missing userId Path Parameters or User data"
+  });
 };
 
 /**
@@ -238,45 +238,45 @@ const handleUpdateUser = async (event) => {
  * @returns {object} response with id of the created user
  */
 const handleCreateUser = async (event) => {
-	if (event.body !== null) {
-		let userData = JSON.parse(event.body);
-		let validUserData;
-		try {
-			validUserData = await addUserSchema.validateAsync(userData);
-		} catch (error) {
-			return buildResponse(400, {
-				message: error.message
-			});
-		}
+  if (event.body !== null) {
+    let userData = JSON.parse(event.body);
+    let validUserData;
+    try {
+      validUserData = await addUserSchema.validateAsync(userData);
+    } catch (error) {
+      return buildResponse(400, {
+        message: error.message
+      });
+    }
 
-		// Validate Team ID
-		const teamData = await checkTeamById(process.env, validUserData.teamId);
+    // Validate Team ID
+    const teamData = await checkTeamById(process.env, validUserData.teamId);
 
-		if (!teamData.success) {
-			return buildResponse(404, { message: teamData.message });
-		}
+    if (!teamData.success) {
+      return buildResponse(404, { message: teamData.message });
+    }
 
-		// Validate if the user already exists
-		const existingUser = await checkUserExists(process.env, validUserData);
+    // Validate if the user already exists
+    const existingUser = await checkUserExists(process.env, validUserData);
 
-		if (!existingUser.success) {
-			return buildResponse(400, { message: existingUser.message });
-		}
+    if (!existingUser.success) {
+      return buildResponse(400, { message: existingUser.message });
+    }
 
-		// Add Created user id
-		validUserData.createdByUserId = event.requestContext.authorizer.userId;
+    // Add Created user id
+    validUserData.createdByUserId = event.requestContext.authorizer.userId;
 
-		// create user
-		let userCreateResponse = await addUser(process.env, validUserData);
+    // create user
+    let userCreateResponse = await addUser(process.env, validUserData);
 
-		return buildResponse(200, {
-			id: userCreateResponse.id,
-			message: "User created successfully"
-		});
-	}
-	return buildResponse(400, {
-		message: "Requires Uesr data"
-	});
+    return buildResponse(200, {
+      id: userCreateResponse.id,
+      message: "User created successfully"
+    });
+  }
+  return buildResponse(400, {
+    message: "Requires Uesr data"
+  });
 };
 
 /**
@@ -285,56 +285,56 @@ const handleCreateUser = async (event) => {
  * @returns response array of object containing
  */
 const handleDeleteUser = async (event) => {
-	if (event.pathParameters) {
-		let validUserId;
-		try {
-			let pathParams = event.pathParameters;
-			validUserId = await userIdSchema.validateAsync(pathParams);
-		} catch (error) {
-			return buildResponse(400, {
-				message: error.message
-			});
-		}
+  if (event.pathParameters) {
+    let validUserId;
+    try {
+      let pathParams = event.pathParameters;
+      validUserId = await userIdSchema.validateAsync(pathParams);
+    } catch (error) {
+      return buildResponse(400, {
+        message: error.message
+      });
+    }
 
-		// Check user exists
-		let userDataResponse = await getUserDetailsById(
-			process.env,
-			validUserId.userId
-		);
-		if (!userDataResponse.success) {
-			return buildResponse(404, { message: userDataResponse.message });
-		}
+    // Check user exists
+    let userDataResponse = await getUserDetailsById(
+      process.env,
+      validUserId.userId
+    );
+    if (!userDataResponse.success) {
+      return buildResponse(404, { message: userDataResponse.message });
+    }
 
-		// Check if user is associated with any entity
-		let userAssociated = await checkUserAssociation(
-			process.env,
-			validUserId.userId
-		);
-		if (!userAssociated.success) {
-			return buildResponse(400, { message: userAssociated.message });
-		}
+    // Check if user is associated with any entity
+    let userAssociated = await checkUserAssociation(
+      process.env,
+      validUserId.userId
+    );
+    if (!userAssociated.success) {
+      return buildResponse(400, { message: userAssociated.message });
+    }
 
-		// TODO Delete from user_access table when authorization is introduced.
+    // TODO Delete from user_access table when authorization is introduced.
 
-		// Delete the user
-		const deleteAccountResponse = await deleteUserById(
-			process.env,
-			validUserId.userId
-		);
-		console.log("deleteAccountResponse", deleteAccountResponse);
+    // Delete the user
+    const deleteAccountResponse = await deleteUserById(
+      process.env,
+      validUserId.userId
+    );
+    console.log("deleteAccountResponse", deleteAccountResponse);
 
-		return buildResponse(200, { message: "User Deleted Successfully" });
-	}
-	return buildResponse(400, {
-		message: "Missing userId Path Parameter"
-	});
+    return buildResponse(200, { message: "User Deleted Successfully" });
+  }
+  return buildResponse(400, {
+    message: "Missing userId Path Parameter"
+  });
 };
 
 module.exports = {
-	lambdaHandler,
-	handleGetAllUsers,
-	handleGetUserDetails,
-	handleUpdateUser,
-	handleDeleteUser,
-	handleCreateUser
+  lambdaHandler,
+  handleGetAllUsers,
+  handleGetUserDetails,
+  handleUpdateUser,
+  handleDeleteUser,
+  handleCreateUser
 };
