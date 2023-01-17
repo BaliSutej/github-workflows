@@ -4,6 +4,10 @@ const {
   getUserDetailsById,
   checkTeamById,
   updateUserById,
+  addUser,
+  checkUserExists,
+  checkUserAssociation,
+  deleteUserById
 } = require("./userMaintenance.service");
 const {
   teamKeywordSchema,
@@ -184,6 +188,17 @@ const handleUpdateUser = async (event) => {
   if (event.pathParameters !== null && event.body !== null) {
     let validUserId;
     let validUserData;
+    try {
+      let pathParams = event.pathParameters;
+      let userData = JSON.parse(event.body);
+
+      validUserId = await userIdSchema.validateAsync(pathParams);
+      validUserData = await updateUserSchema.validateAsync(userData);
+    } catch (error) {
+      return buildResponse(400, {
+        message: error.message
+      });
+    }
 
     // Validate Team ID
     let teamData = await checkTeamById(process.env, validUserData.teamId);
