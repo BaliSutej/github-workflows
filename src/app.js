@@ -207,15 +207,6 @@ const handleUpdateUser = async (event) => {
       return buildResponse(404, { message: teamData.message });
     }
 
-    // Add user details
-    validUserData.updatedByUserId = event.requestContext.authorizer.userId;
-
-    let updateData = await updateUserById(
-      process.env,
-      validUserData,
-      validUserId.userId
-    );
-
     if (!updateData.success) {
       return buildResponse(500, {
         message: updateData.message
