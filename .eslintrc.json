@@ -1,0 +1,28 @@
+{
+	"env": {
+		"browser": true,
+		"commonjs": true,
+		"es2021": true
+	},
+	"extends": "eslint:recommended",
+	"overrides": [],
+	"parserOptions": {
+		"ecmaVersion": "latest"
+	},
+	"globals": {
+		"process": "readonly"
+	},
+	"rules": {
+		"eqeqeq": "error",
+		"no-new-require": "warn",
+		"no-self-assign": "warn",
+		"no-useless-escape": 0,
+		"no-unused-vars": [
+			"error",
+			{
+				"vars": "all",
+				"args": "none"
+			}
+		]
+	}
+}
