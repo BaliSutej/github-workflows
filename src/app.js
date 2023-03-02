@@ -24,7 +24,6 @@ const {
 const lambdaHandler = async (event, context) => {
 	let response; // response variable returned by lambda
 
-	let x;
 	try {
 		/**
 		 * Logging event object received by lambda
