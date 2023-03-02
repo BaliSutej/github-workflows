@@ -38,3 +38,6 @@ jobs:
 
       - name: Run Pretty Style Check
         run: npm run style:prettier
+
+      - name: Run Eslint Check
+        run: npm run lint
