@@ -3,12 +3,14 @@ const {
   getAllUsers,
   getUserDetailsById,
   checkTeamById,
-  updateUserById,
+  checkUserExists,
+  addUser,
+  checkUserAssociation,
+  deleteUserById
 } = require("./userMaintenance.service");
 const {
   teamKeywordSchema,
   userIdSchema,
-  updateUserSchema,
   addUserSchema
 } = require("./userMaintenance.validation");
 /**
@@ -182,7 +184,7 @@ const handleGetUserDetails = async (event) => {
  */
 const handleUpdateUser = async (event) => {
   if (event.pathParameters !== null && event.body !== null) {
-    let validUserId;
+    // let validUserId;
     let validUserData;
 
     // Validate Team ID
@@ -190,7 +192,9 @@ const handleUpdateUser = async (event) => {
 
     if (!teamData.success) {
       return buildResponse(404, { message: teamData.message });
+
     }
+    let updateData;
 
     if (!updateData.success) {
       return buildResponse(500, {
