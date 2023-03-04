@@ -68,3 +68,6 @@ jobs:
 
       - name: Run Unit Test Script
         run: npm run test:unit
+
+      - name: Run Test Coverage Script
+        run: npm run testcoverage:unit

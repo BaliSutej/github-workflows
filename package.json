@@ -5,6 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"test:unit": "jest /tests/unit",
+		"testcoverage:unit": "jest /tests/unit --coverage",
 		"style:prettier": "prettier --check '**/*.{js,jsx,ts,tsx}'",
 		"lint": "eslint '**/*.js'"
 	},
