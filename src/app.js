@@ -35,7 +35,7 @@ const lambdaHandler = async (event, context) => {
 		 * variables used in switch statements
 		 */
 		let eventMethod = event.httpMethod;
-		// Just Test
+		// assigning event resource to event path
 		let eventPath = event.resource;
 		switch (eventPath) {
 			case "/user":
